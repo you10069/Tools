@@ -6,7 +6,7 @@ After=network.target
 WorkingDirectory=/etc/sing-panel
 ExecStart=/etc/sing-panel/sing-panel
 Restart=always
-RestartSec=10
+RestartSec=5
 
 [Install]
 WantedBy=multi-user.target
