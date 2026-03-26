@@ -1,0 +1,12 @@
+[Unit]
+Description=sing-panel service
+After=network.target
+
+[Service]
+WorkingDirectory=/etc/sing-box
+ExecStart=/etc/sing-panel/sing-panel
+Restart=always
+RestartSec=10
+
+[Install]
+WantedBy=multi-user.target
