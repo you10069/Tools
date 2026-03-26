@@ -4,7 +4,7 @@ After=network.target
 
 [Service]
 WorkingDirectory=/etc/sing-box
-ExecStart=/etc/sing-panel/sing-panel
+ExecStart=/usr/bin/sing-panel
 Restart=always
 RestartSec=10
 
