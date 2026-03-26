@@ -3,8 +3,8 @@ Description=sing-panel service
 After=network.target
 
 [Service]
-WorkingDirectory=/etc/sing-box
-ExecStart=/usr/bin/sing-panel
+WorkingDirectory=/etc/sing-panel
+ExecStart=/etc/sing-panel/sing-panel
 Restart=always
 RestartSec=10
 
