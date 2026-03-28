@@ -2,7 +2,7 @@
 set -e
 
 # ============================
-# 颜色定义
+# 定义颜色
 # ============================
 ORANGE="\033[1;33m"
 BLUE="\033[1;34m"
@@ -104,4 +104,5 @@ echo -e "${ORANGE}==============================================${RESET}"
 echo -e "${ORANGE}🎉 安装完成！你可以启动服务：${RESET}"
 echo -e "${ORANGE}  systemctl start sing-panel${RESET}"
 echo -e "${ORANGE}  systemctl enable sing-panel${RESET}"
+echo -e "${ORANGE}  journalctl -u sing-panel --output cat -f${RESET}"
 echo -e "${ORANGE}==============================================${RESET}"
