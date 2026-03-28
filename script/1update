@@ -1,0 +1,34 @@
+#!/bin/bash
+
+set -e
+
+echo "🔄 更新软件源..."
+apt update -y
+
+echo "📦 安装依赖..."
+apt install -y \
+    bash \
+    command-not-found \
+    wget \
+    curl \
+    openssl \
+    passwd \
+    tar \
+    zstd \
+    xz-utils \
+    iptables \
+    ufw \
+    net-tools \
+    dnsutils \
+    libnss3 \
+    tzdata \
+    bc \
+    zip \
+    unzip \
+    iperf3 \
+    git \
+    sqlite3 \
+    jq \
+    socat
+
+echo "✨ 安装完成！"
