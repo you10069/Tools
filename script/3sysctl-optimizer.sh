@@ -1,5 +1,9 @@
 #!/usr/bin/env bash
 
+# ====== 颜色定义（全部蓝色） ======
+BLUE="\033[34m"
+RESET="\033[0m"
+
 CONF="/etc/sysctl.conf"
 
 # 要追加的内容
@@ -59,7 +63,7 @@ EOF
 
 # 确保文件存在
 if [ ! -f "$CONF" ]; then
-    echo "文件不存在: $CONF"
+    echo -e "${BLUE}文件不存在: $CONF${RESET}"
     exit 1
 fi
 
@@ -82,10 +86,10 @@ done
 # 追加内容
 echo "$ADD_CONTENT" >> "$CONF"
 
-echo "已成功在 $CONF 末尾空6行后追加优化内容。"
+echo -e "${BLUE}已成功在 $CONF 末尾空6行后追加优化内容。${RESET}"
 
 # 立即生效
-echo "正在应用 sysctl 配置..."
+echo -e "${BLUE}正在应用 sysctl 配置...${RESET}"
 sysctl -p
 
-echo "优化完成。"
+echo -e "${BLUE}优化完成。${RESET}"
