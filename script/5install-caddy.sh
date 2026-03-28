@@ -114,7 +114,7 @@ echo -e "${YELLOW}✔ 已选择构建：${TARGET_BIN}${RESET}"
 # ---------------------------------------------------------
 echo -e "${BLUE}[5/10] 创建 Caddy 目录结构 ...${RESET}"
 
-mkdir -p /etc/caddy/all
+mkdir -p /etc/caddy/users
 mkdir -p /etc/caddy/speedtestfiles
 
 echo -e "${YELLOW}✔ 目录创建完成${RESET}"
