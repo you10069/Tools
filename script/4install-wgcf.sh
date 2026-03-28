@@ -36,5 +36,7 @@ echo -e "${BLUE}==> 注册 Cloudflare WARP 账户${RESET}"
 echo -e "${BLUE}==> 生成 Xray 配置${RESET}"
 ./wgcf-cli generate --xray
 
+echo -e "${BLUE}==> 查看生成的文件${RESET}"
+ls -l
+
 echo -e "${ORANGE}== 安装完成 ==${RESET}"
-echo -e "${BLUE}生成文件：wgcf-account.toml、wgcf-profile.conf、wgcf-profile.json${RESET}"
