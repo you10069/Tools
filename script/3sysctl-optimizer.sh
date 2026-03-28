@@ -92,4 +92,14 @@ echo -e "${BLUE}已成功在 $CONF 末尾空6行后追加优化内容。${RESET}
 echo -e "${BLUE}正在应用 sysctl 配置...${RESET}"
 sysctl -p
 
+# ====== 时区检查并设置 ======
+echo -e "${BLUE}正在检查系统是否支持 Asia/Hong_Kong 时区...${RESET}"
+
+if timedatectl list-timezones | grep -Ei 'Hong_Kong|Shanghai' >/dev/null 2>&1; then
+    echo -e "${BLUE}检测到系统支持 Asia/Hong_Kong，正在设置...${RESET}"
+    timedatectl set-timezone Asia/Hong_Kong
+else
+    echo -e "${BLUE}系统未找到 Hong_Kong 或 Shanghai 时区，跳过时区设置。${RESET}"
+fi
+
 echo -e "${BLUE}优化完成。${RESET}"
