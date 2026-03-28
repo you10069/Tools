@@ -154,7 +154,7 @@ echo -e "${YELLOW}✔ 目录权限已设置${RESET}"
 echo -e "${BLUE}[7/10] 获取最新 CaddyAll 构建 ...${RESET}"
 
 LATEST_URL=$(curl -s https://api.github.com/repos/you10069/Build/releases \
-    | grep browser_download_url \
+    | grep '"browser_download_url"' \
     | grep "CaddyAll-" \
     | grep "$TARGET_BIN" \
     | head -n 1 \
