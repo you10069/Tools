@@ -72,9 +72,9 @@ case "$choice_main" in
                 echo "--------------------------------------------------"
 
                 while true; do
-                    read -p "请输入用于 iperf3 的端口号（默认 10000）： " iperf_port
+                    read -p "请输入用于 iperf3 的端口号（默认 80）： " iperf_port
                     iperf_port=${iperf_port// /}
-                    iperf_port=${iperf_port:-10000}
+                    iperf_port=${iperf_port:-80}
 
                     if [[ "$iperf_port" =~ ^[0-9]+$ ]] && [ "$iperf_port" -ge 1 ] && [ "$iperf_port" -le 65535 ]; then
                         break
@@ -134,14 +134,23 @@ case "$choice_main" in
                     current_wmem=$(sysctl net.ipv4.tcp_wmem | awk '{print $NF}')
                     current_rmem=$(sysctl net.ipv4.tcp_rmem | awk '{print $NF}')
 
-                    echo "当前发送缓冲区 max：$current_wmem bytes"
-                    echo "当前接收缓冲区 max：$current_rmem bytes"
+                    # 转换为 MiB（保留两位小数）
+                    current_wmem_mib=$(echo "scale=2; $current_wmem / 1024 / 1024" | bc)
+                    current_rmem_mib=$(echo "scale=2; $current_rmem / 1024 / 1024" | bc)
+
+                    echo "当前发送缓冲区 max：$current_wmem bytes（${current_wmem_mib} MiB）"
+                    echo "当前接收缓冲区 max：$current_rmem bytes（${current_rmem_mib} MiB）"
 
                     read -p "发送缓冲区调整值 (MiB，可小数，可负数): " adjust_value
                     read -p "接收缓冲区调整值 (MiB，可小数，可负数): " adjust_value_2
 
+                    # 计算新值（支持小数）
                     new_wmem=$(echo "$current_wmem + $adjust_value * 1024 * 1024" | bc | awk '{printf "%d", $0}')
                     new_rmem=$(echo "$current_rmem + $adjust_value_2 * 1024 * 1024" | bc | awk '{printf "%d", $0}')
+
+                    # 转换为 MiB（保留两位小数）
+                    new_wmem_mib=$(echo "scale=2; $new_wmem / 1024 / 1024" | bc)
+                    new_rmem_mib=$(echo "scale=2; $new_rmem / 1024 / 1024" | bc)
 
                     if [ $new_wmem -lt 4096 ] || [ $new_rmem -lt 4096 ]; then
                         echo "错误：新值小于 4096，操作取消"
@@ -149,6 +158,8 @@ case "$choice_main" in
                         sysctl -w net.ipv4.tcp_wmem="4096 16384 $new_wmem"
                         sysctl -w net.ipv4.tcp_rmem="4096 87380 $new_rmem"
                         echo "已应用（临时生效）"
+                        echo "新的发送缓冲区 max：$new_wmem bytes（${new_wmem_mib} MiB）"
+                        echo "新的接收缓冲区 max：$new_rmem bytes（${new_rmem_mib} MiB）"
                     fi
 
                     echo "--------------------------------------------------"
