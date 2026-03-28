@@ -8,6 +8,16 @@ Requires=network-online.target
 Type=notify
 User=caddy
 Group=caddy
+ExecStart=/usr/bin/caddy run --environ --config /etc/caddy/Caddyfile
+ExecReload=/usr/bin/caddy reload --config /etc/caddy/Caddyfile --force
+TimeoutStopSec=5s
+LimitNOFILE=infinity
+PrivateTmp=true
+ProtectSystem=full
+AmbientCapabilities=CAP_NET_ADMIN CAP_NET_BIND_SERVICE
+
+# 允许caddy读写
+ReadWritePaths=/etc/caddy/all
 
 # 将证书、密钥等核心数据放在这里
 # Environment="XDG_DATA_HOME=/etc/caddy/all/data"
@@ -16,15 +26,6 @@ Environment="XDG_DATA_HOME=/etc/caddy/all"
 # 将自动保存的配置 autosave.json 等放在这里
 # Environment="XDG_CONFIG_HOME=/etc/caddy/all/config"
 Environment="XDG_CONFIG_HOME=/etc/caddy/all"
-
-ExecStart=/usr/bin/caddy run --environ --config /etc/caddy/Caddyfile
-ExecReload=/usr/bin/caddy reload --config /etc/caddy/Caddyfile --force
-TimeoutStopSec=5s
-LimitNOFILE=infinity
-PrivateTmp=true
-ProtectSystem=full
-ReadWritePaths=/etc/caddy/all
-AmbientCapabilities=CAP_NET_ADMIN CAP_NET_BIND_SERVICE
 
 [Install]
 WantedBy=multi-user.target
