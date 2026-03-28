@@ -82,7 +82,7 @@ done
 # 追加内容
 echo "$ADD_CONTENT" >> "$CONF"
 
-echo "已成功在 $CONF 末尾空三行后追加优化内容。"
+echo "已成功在 $CONF 末尾空6行后追加优化内容。"
 
 # 立即生效
 echo "正在应用 sysctl 配置..."
