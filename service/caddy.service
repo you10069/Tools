@@ -15,7 +15,7 @@ Environment="XDG_DATA_HOME=/etc/caddy/all"
 
 # 将自动保存的配置 autosave.json 等放在这里
 # Environment="XDG_CONFIG_HOME=/etc/caddy/all/config"
-# Environment="XDG_CONFIG_HOME=/etc/caddy/all"
+Environment="XDG_CONFIG_HOME=/etc/caddy/all"
 
 ExecStart=/usr/bin/caddy run --environ --config /etc/caddy/Caddyfile
 ExecReload=/usr/bin/caddy reload --config /etc/caddy/Caddyfile --force
