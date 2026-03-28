@@ -71,7 +71,7 @@ END_EMPTY_LINES=$(tac "$CONF" | awk '
 ')
 
 # 需要补齐的空行数
-NEED=$((3 - END_EMPTY_LINES))
+NEED=$((6 - END_EMPTY_LINES))
 if [ $NEED -lt 0 ]; then NEED=0; fi
 
 # 追加空行
@@ -83,3 +83,9 @@ done
 echo "$ADD_CONTENT" >> "$CONF"
 
 echo "已成功在 $CONF 末尾空三行后追加优化内容。"
+
+# 立即生效
+echo "正在应用 sysctl 配置..."
+sysctl -p
+
+echo "优化完成。"
