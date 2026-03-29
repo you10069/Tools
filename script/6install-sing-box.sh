@@ -121,8 +121,8 @@ echo -e "${YELLOW}✔ Sing-Box 下载完成${RESET}"
 # ---------------------------------------------------------
 echo -e "${BLUE}[6/8] 创建目录结构与配置文件 ...${RESET}"
 
-mkdir -p /etc/sing-box/iptables
 mkdir -p /etc/sing-box/crt
+mkdir -p /etc/sing-box/iptables
 
 touch /etc/sing-box/config_template.json
 touch /etc/sing-box/config.json
