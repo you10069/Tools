@@ -4,7 +4,7 @@ After=network.target
 
 [Service]
 Type=oneshot
-ExecStart=/root/iptables-rules.sh
+ExecStart=/etc/sing-box/iptables/iptables-redirect.sh
 
 [Install]
 WantedBy=multi-user.target
