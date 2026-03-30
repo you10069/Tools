@@ -14,7 +14,6 @@ apt install -y \
     passwd \
     bc \
     jq \
-    openssl \
     tar \
     zstd \
     xz-utils \
@@ -24,6 +23,7 @@ apt install -y \
     iptables \
     ufw \
     net-tools \
+    openssl \
     dnsutils \
     libnss3 \
     socat \
