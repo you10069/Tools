@@ -26,7 +26,6 @@ apt install -y \
     zip \
     unzip \
     iperf3 \
-    git \
     sqlite3 \
     jq \
     socat
