@@ -28,6 +28,6 @@ apt install -y \
     libnss3 \
     socat \
     sqlite3 \
-    iperf3 \
+    iperf3
 
 echo "✨ 安装完成！"
