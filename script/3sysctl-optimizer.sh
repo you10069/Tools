@@ -4,9 +4,43 @@
 BLUE="\033[34m"
 RESET="\033[0m"
 
+# ====== 通用函数：末尾空6行后追加 ======
+append_with_padding() {
+    local FILE="$1"
+    local CONTENT="$2"
+
+    # 确保文件存在
+    if [ ! -f "$FILE" ]; then
+        echo -e "${BLUE}文件不存在: $FILE${RESET}"
+        exit 1
+    fi
+
+    # 计算末尾已有多少空行
+    local END_EMPTY_LINES
+    END_EMPTY_LINES=$(tac "$FILE" | awk '
+        /^[[:space:]]*$/ { n++ }
+        /^[[:space:]]*[^[:space:]]/ { print n; exit }
+        END { if (NR==0) print 0 }
+    ')
+
+    # 需要补齐的空行数
+    local NEED=$((6 - END_EMPTY_LINES))
+    if [ $NEED -lt 0 ]; then NEED=0; fi
+
+    # 追加空行
+    for ((i=0; i<NEED; i++)); do
+        echo "" >> "$FILE"
+    done
+
+    # 追加内容
+    echo "$CONTENT" >> "$FILE"
+}
+
+# ===========================
+# sysctl.conf 优化模块
+# ===========================
 CONF="/etc/sysctl.conf"
 
-# 要追加的内容
 read -r -d '' ADD_CONTENT << 'EOF'
 # 优化开始
 # ===========================
@@ -28,8 +62,8 @@ vm.vfs_cache_pressure = 50
 # ===========================
 net.core.wmem_max = 16777216
 net.core.rmem_max = 16777216
-net.ipv4.tcp_wmem= 4096 16384 8388608
-net.ipv4.tcp_rmem= 4096 87380 8388608
+net.ipv4.tcp_wmem = 4096 16384 8388608
+net.ipv4.tcp_rmem = 4096 87380 8388608
 
 
 # ===========================
@@ -61,38 +95,73 @@ net.ipv4.tcp_fin_timeout = 30
 # 优化结束
 EOF
 
-# 确保文件存在
-if [ ! -f "$CONF" ]; then
-    echo -e "${BLUE}文件不存在: $CONF${RESET}"
-    exit 1
-fi
-
-# 计算末尾已有多少空行
-END_EMPTY_LINES=$(tac "$CONF" | awk '
-    /^[[:space:]]*$/ { n++ }
-    /^[[:space:]]*[^[:space:]]/ { print n; exit }
-    END { if (NR==0) print 0 }
-')
-
-# 需要补齐的空行数
-NEED=$((6 - END_EMPTY_LINES))
-if [ $NEED -lt 0 ]; then NEED=0; fi
-
-# 追加空行
-for ((i=0; i<NEED; i++)); do
-    echo "" >> "$CONF"
-done
-
-# 追加内容
-echo "$ADD_CONTENT" >> "$CONF"
+echo -e "${BLUE}正在处理 $CONF ...${RESET}"
+append_with_padding "$CONF" "$ADD_CONTENT"
 
 echo -e "${BLUE}已成功在 $CONF 末尾空6行后追加优化内容。${RESET}"
 
-# 立即生效
 echo -e "${BLUE}正在应用 sysctl 配置...${RESET}"
 sysctl -p
 
-# ====== 时区检查并设置 ======
+
+
+# ===========================
+# journald.conf 交互 + 追加模块
+# ===========================
+JOURNAL_CONF="/etc/systemd/journald.conf"
+
+echo -e "${BLUE}正在配置 /etc/systemd/journald.conf 日志限制...${RESET}"
+
+DEFAULT_RUNTIME="50M"
+DEFAULT_SYSTEM="100M"
+
+# 输入 RuntimeMaxUse
+echo -e "${BLUE}请输入journald.conf的RuntimeMaxUse（默认：50M）${RESET}"
+read -r INPUT_RUNTIME
+[[ -z "$INPUT_RUNTIME" ]] && INPUT_RUNTIME="$DEFAULT_RUNTIME"
+
+if [[ "$INPUT_RUNTIME" =~ ^[0-9]+$ ]]; then
+    INPUT_RUNTIME="${INPUT_RUNTIME}M"
+elif [[ "$INPUT_RUNTIME" =~ ^[0-9]+[Mm]$ ]]; then
+    INPUT_RUNTIME="${INPUT_RUNTIME^^}"
+else
+    echo -e "${BLUE}输入无效，必须为纯数字或数字+M${RESET}"
+    exit 1
+fi
+
+# 输入 SystemMaxUse
+echo -e "${BLUE}请输入journald.conf的SystemMaxUse（默认：100M）${RESET}"
+read -r INPUT_SYSTEM
+[[ -z "$INPUT_SYSTEM" ]] && INPUT_SYSTEM="$DEFAULT_SYSTEM"
+
+if [[ "$INPUT_SYSTEM" =~ ^[0-9]+$ ]]; then
+    INPUT_SYSTEM="${INPUT_SYSTEM}M"
+elif [[ "$INPUT_SYSTEM" =~ ^[0-9]+[Mm]$ ]]; then
+    INPUT_SYSTEM="${INPUT_SYSTEM^^}"
+else
+    echo -e "${BLUE}输入无效，必须为纯数字或数字+M${RESET}"
+    exit 1
+fi
+
+# 追加内容（仅一个空格）
+JOURNAL_CONTENT="RuntimeMaxUse = $INPUT_RUNTIME
+SystemMaxUse = $INPUT_SYSTEM"
+
+echo -e "${BLUE}正在写入 /etc/systemd/journald.conf ...${RESET}"
+append_with_padding "$JOURNAL_CONF" "$JOURNAL_CONTENT"
+
+echo -e "${BLUE}journald.conf 已更新：${RESET}"
+echo -e "${BLUE}  RuntimeMaxUse = $INPUT_RUNTIME${RESET}"
+echo -e "${BLUE}  SystemMaxUse = $INPUT_SYSTEM${RESET}"
+
+systemctl restart systemd-journald
+echo -e "${BLUE}journald 配置完成。${RESET}"
+
+
+
+# ===========================
+# 时区设置模块
+# ===========================
 echo -e "${BLUE}正在检查系统是否支持 Asia/Hong_Kong 时区...${RESET}"
 
 if timedatectl list-timezones | grep -Ei 'Hong_Kong|Shanghai' >/dev/null 2>&1; then
