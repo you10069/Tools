@@ -25,9 +25,9 @@ apt install -y \
     bc \
     zip \
     unzip \
-    iperf3 \
-    sqlite3 \
     jq \
-    socat
+    socat \
+    sqlite3 \
+    iperf3 \
 
 echo "✨ 安装完成！"
