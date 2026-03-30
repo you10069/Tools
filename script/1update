@@ -13,6 +13,7 @@ apt install \
     curl \
     passwd \
     tzdata \
+    cron \
     bc \
     jq \
     tar \
