@@ -158,7 +158,7 @@ crontab -l
 printf "\n\n"
 
 
-printf "${BLUE}⚙️  sysctl.conf 有效配置${RESET}\n"
+printf "${BLUE}⚙️ /etc/sysctl.conf 有效配置${RESET}\n"
 printf "%s\n" "$LINE"
 
 sed -e '/^\s*#/d' -e '/^\s*$/d' /etc/sysctl.conf
@@ -166,7 +166,7 @@ sed -e '/^\s*#/d' -e '/^\s*$/d' /etc/sysctl.conf
 printf "\n\n"
 
 
-printf "${BLUE}⚙️  sysctl.conf 我的配置${RESET}\n"
+printf "${BLUE}⚙️ /etc/sysctl.conf 我的配置${RESET}\n"
 printf "%s\n" "$LINE"
 
 sed -n '/^# 优化开始$/,$p' /etc/sysctl.conf
