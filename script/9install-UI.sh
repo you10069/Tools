@@ -17,7 +17,7 @@ UI_DIR="/etc/sing-box/ui"
 # ============================
 echo -e "${ORANGE}"
 echo "==============================================="
-echo "==              Clash面板 快速安装           =="
+echo "==              Clash 面板安装脚本           =="
 echo "==============================================="
 echo -e "${RESET}"
 
@@ -91,9 +91,23 @@ step 4 $TOTAL "安装面板"
 unzip -q "$TMP_ZIP" -d /tmp/ui_extract
 
 if [[ "$choice" == "1" ]]; then
-    mv /tmp/ui_extract/* "$UI_DIR/"
+    # Zash: dist.zip -> dist/*
+    if [[ -d /tmp/ui_extract/dist ]]; then
+        mv /tmp/ui_extract/dist/* "$UI_DIR/"
+    else
+        echo -e "${RED}未找到 dist 目录，Zash 压缩包结构可能有变。${RESET}"
+        rm -rf /tmp/ui_extract "$TMP_ZIP"
+        exit 1
+    fi
 else
-    mv /tmp/ui_extract/metacubexd-gh-pages/* "$UI_DIR/"
+    # MetaCubeXD: gh-pages.zip -> metacubexd-gh-pages/*
+    if [[ -d /tmp/ui_extract/metacubexd-gh-pages ]]; then
+        mv /tmp/ui_extract/metacubexd-gh-pages/* "$UI_DIR/"
+    else
+        echo -e "${RED}未找到 metacubexd-gh-pages 目录，XD 压缩包结构可能有变。${RESET}"
+        rm -rf /tmp/ui_extract "$TMP_ZIP"
+        exit 1
+    fi
 fi
 
 rm -rf /tmp/ui_extract "$TMP_ZIP"
@@ -106,6 +120,6 @@ echo -e "${GREEN}你现在可以在 Caddy 中设置 root 指向该目录。${RES
 # ============================
 echo -e "${ORANGE}"
 echo "==============================================="
-echo "==              Clash面板 安装完成！         =="
+echo "==              Clash 面板安装完成！         =="
 echo "==============================================="
 echo -e "${RESET}"
