@@ -7,25 +7,25 @@ apt update -y
 
 echo "📦 安装常用工具..."
 apt install -y \
-    bash \
     command-not-found \
+    bash \
     wget \
     curl \
-    openssl \
     passwd \
+    bc \
+    jq \
+    openssl \
     tar \
     zstd \
     xz-utils \
+    tzdata \
+    zip \
+    unzip \
     iptables \
     ufw \
     net-tools \
     dnsutils \
     libnss3 \
-    tzdata \
-    bc \
-    zip \
-    unzip \
-    jq \
     socat \
     sqlite3 \
     iperf3 \
