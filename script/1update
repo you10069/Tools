@@ -12,12 +12,12 @@ apt install -y \
     wget \
     curl \
     passwd \
+    tzdata \
     bc \
     jq \
     tar \
     zstd \
     xz-utils \
-    tzdata \
     zip \
     unzip \
     iptables \
