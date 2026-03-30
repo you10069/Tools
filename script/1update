@@ -6,7 +6,7 @@ echo "🔄 更新软件源..."
 apt update -y
 
 echo "📦 安装常用工具..."
-apt install -y \
+apt install \
     command-not-found \
     bash \
     wget \
