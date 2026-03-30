@@ -160,7 +160,7 @@ sed -n '/^# 优化开始$/,$p' /etc/sysctl.conf
 printf "\n\n"
 
 
-printf "${BLUE}📝 journald 有效配置${RESET}\n"
+printf "${BLUE}📝 /etc/systemd/journald.conf 有效配置${RESET}\n"
 printf "%s\n" "$LINE"
 sed -e '/^\s*#/d' -e '/^\s*$/d' /etc/systemd/journald.conf
 printf "\n\n"
