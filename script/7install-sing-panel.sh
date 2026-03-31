@@ -17,13 +17,13 @@ echo -e "${ORANGE}==============================================${RESET}"
 # ---------------------------------------------------------
 # 1. 创建目录
 # ---------------------------------------------------------
-echo -e "${BLUE}[1/7] 创建目录 /etc/sing-panel ...${RESET}"
+echo -e "${BLUE}[1/9] 创建目录 /etc/sing-panel ...${RESET}"
 mkdir -p /etc/sing-panel
 
 # ---------------------------------------------------------
 # 2. 自动检测最新 web-vX 分支
 # ---------------------------------------------------------
-echo -e "${BLUE}[2/7] 获取最新 web-vX 分支 ...${RESET}"
+echo -e "${BLUE}[2/9] 获取最新 web-vX 分支 ...${RESET}"
 
 LATEST_WEB_BRANCH=$(
   curl -s https://api.github.com/repos/you10069/Sing-Panel/branches \
@@ -43,7 +43,7 @@ echo -e "${GREEN}➡️ 最新前端分支: ${LATEST_WEB_BRANCH}${RESET}"
 # ---------------------------------------------------------
 # 3. 下载前端文件
 # ---------------------------------------------------------
-echo -e "${BLUE}[3/7] 下载前端 sing-panel.html ...${RESET}"
+echo -e "${BLUE}[3/9] 下载前端 sing-panel.html ...${RESET}"
 
 wget -O /etc/sing-panel/sing-panel.html \
   "https://raw.githubusercontent.com/you10069/Sing-Panel/${LATEST_WEB_BRANCH}/sing-panel.html"
@@ -52,9 +52,37 @@ chmod 644 /etc/sing-panel/sing-panel.html
 echo -e "${GREEN}✔ 前端文件已更新${RESET}"
 
 # ---------------------------------------------------------
-# 4. 自动检测最新后端 release（含 prerelease）
+# 4. 设置 API 前缀路径
 # ---------------------------------------------------------
-echo -e "${BLUE}[4/7] 获取最新后端 sing-panel-amd64 ...${RESET}"
+echo -e "${BLUE}[4/9] 设置 API 前缀路径 ...${RESET}"
+
+read -p "$(echo -e ${BLUE}请输入 API 前缀（留空则自动生成 32 位随机字符串）：${RESET}) " API_PREFIX
+
+# 如果为空，则生成 32 位随机字符串
+if [[ -z "$API_PREFIX" ]]; then
+  API_PREFIX=$(tr -dc 'A-Za-z0-9' </dev/urandom | head -c 32)
+  echo -e "${GREEN}✔ 已自动生成随机前缀：${API_PREFIX}${RESET}"
+else
+  echo -e "${GREEN}✔ 使用用户输入的前缀：${API_PREFIX}${RESET}"
+fi
+
+# 确保前缀以 / 开头
+API_PREFIX="/${API_PREFIX}"
+
+# ---------------------------------------------------------
+# 5. 替换前端 HTML 中的 API 路径
+# ---------------------------------------------------------
+echo -e "${BLUE}[5/9] 替换前端 HTML 中的 API 路径 ...${RESET}"
+
+# 替换所有 fetch('/xxxx/api/...') 的前缀
+sed -i "s#fetch('/[A-Za-z0-9]\+/api/#fetch('${API_PREFIX}/api/#g" /etc/sing-panel/sing-panel.html
+
+echo -e "${GREEN}✔ API 路径已成功替换为：${API_PREFIX}${RESET}"
+
+# ---------------------------------------------------------
+# 6. 自动检测最新后端 release（含 prerelease）
+# ---------------------------------------------------------
+echo -e "${BLUE}[6/9] 获取最新后端 sing-panel-amd64 ...${RESET}"
 
 LATEST_URL=$(
   curl -s https://api.github.com/repos/you10069/Sing-Panel/releases \
@@ -72,9 +100,9 @@ fi
 echo -e "${GREEN}➡️ 最新后端下载地址: ${LATEST_URL}${RESET}"
 
 # ---------------------------------------------------------
-# 5. 下载后端程序
+# 7. 下载后端程序
 # ---------------------------------------------------------
-echo -e "${BLUE}[5/7] 下载后端程序 ...${RESET}"
+echo -e "${BLUE}[7/9] 下载后端程序 ...${RESET}"
 
 wget -O /etc/sing-panel/sing-panel "$LATEST_URL"
 chmod 755 /etc/sing-panel/sing-panel
@@ -82,9 +110,9 @@ chmod 755 /etc/sing-panel/sing-panel
 echo -e "${GREEN}✔ 后端程序已更新${RESET}"
 
 # ---------------------------------------------------------
-# 6. 下载 systemd 服务文件
+# 8. 下载 systemd 服务文件
 # ---------------------------------------------------------
-echo -e "${BLUE}[6/7] 下载 systemd 服务文件 ...${RESET}"
+echo -e "${BLUE}[8/9] 下载 systemd 服务文件 ...${RESET}"
 
 wget -O /etc/systemd/system/sing-panel.service \
   https://raw.githubusercontent.com/you10069/Tools/main/service/sing-panel.service
@@ -94,9 +122,9 @@ chmod 644 /etc/systemd/system/sing-panel.service
 echo -e "${GREEN}✔ systemd 服务文件已更新${RESET}"
 
 # ---------------------------------------------------------
-# 7. 重载 systemd
+# 9. 重载 systemd
 # ---------------------------------------------------------
-echo -e "${BLUE}[7/7] 重新加载 systemd ...${RESET}"
+echo -e "${BLUE}[9/9] 重新加载 systemd ...${RESET}"
 
 systemctl daemon-reload
 
