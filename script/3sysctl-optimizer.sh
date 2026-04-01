@@ -63,7 +63,7 @@ vm.vfs_cache_pressure = 50
 net.core.wmem_max = 16777216
 net.core.rmem_max = 16777216
 net.ipv4.tcp_wmem = 4096 16384 8388608
-net.ipv4.tcp_rmem = 4096 87380 8388608
+net.ipv4.tcp_rmem = 4096 131072 8388608
 
 
 # ===========================
