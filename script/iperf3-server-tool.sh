@@ -156,7 +156,7 @@ case "$choice_main" in
                         echo "错误：新值小于 4096，操作取消"
                     else
                         sysctl -w net.ipv4.tcp_wmem="4096 16384 $new_wmem"
-                        sysctl -w net.ipv4.tcp_rmem="4096 87380 $new_rmem"
+                        sysctl -w net.ipv4.tcp_rmem="4096 131072 $new_rmem"
                         echo "已应用（临时生效）"
                         echo "新的发送缓冲区 max：$new_wmem bytes（${new_wmem_mib} MiB）"
                         echo "新的接收缓冲区 max：$new_rmem bytes（${new_rmem_mib} MiB）"
