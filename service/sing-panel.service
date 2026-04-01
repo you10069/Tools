@@ -1,6 +1,6 @@
 [Unit]
 Description=sing-panel service
-After=network.target
+After=network.target sing-box.service
 
 [Service]
 WorkingDirectory=/etc/sing-panel
