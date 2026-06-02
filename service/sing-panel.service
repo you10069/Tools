@@ -5,6 +5,7 @@ Requires=sing-box.service
 
 [Service]
 WorkingDirectory=/etc/sing-panel
+ExecStartPre=/bin/sleep 10
 ExecStart=/etc/sing-panel/sing-panel
 Restart=always
 RestartSec=5
