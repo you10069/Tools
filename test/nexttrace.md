@@ -1,5 +1,6 @@
 nexttrace --fast-trace
 
+广州电信：nexttrace 121.32.93.121
 广州联通：nexttrace 112.96.43.46
 
 wget -O /usr/local/bin/nexttrace https://github.com/nxtrace/NTrace-core/releases/download/v1.7.1/nexttrace_linux_amd64 && chmod +x /usr/local/bin/nexttrace && nexttrace --fast-trace
