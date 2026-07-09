@@ -6,7 +6,7 @@ iplocal=(北京电信 北京联通 北京移动 上海电信 上海联通 上海
 echo -e "\n正在测试,请稍等..."
 echo -e "——————————————————————————————\n"
 for i in {0..8}; do
-	mtr -r --n --tcp ${iplise[i]} > /root/traceroute_testlog
+	mtr -r --n --tcp ${iplise[i]} | tee /root/traceroute_testlog
 	grep -q "59\.43\." /root/traceroute_testlog
 	if [ $? == 0 ];then
 		grep -q "202\.97\."  /root/traceroute_testlog
