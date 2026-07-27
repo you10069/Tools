@@ -1,0 +1,11 @@
+[Unit]
+Description=Update UFW rules to only allow Cloudflare IPs
+After=network-online.target ufw.service
+Wants=network-online.target
+
+[Service]
+Type=oneshot
+ExecStart=/etc/sing-box/iptables/ufw-allow-cloudflare.sh
+
+[Install]
+WantedBy=multi-user.target
