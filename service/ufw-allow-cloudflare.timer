@@ -1,0 +1,9 @@
+[Unit]
+Description=Daily update of Cloudflare UFW rules
+
+[Timer]
+OnCalendar=daily
+Persistent=true
+
+[Install]
+WantedBy=timers.target
