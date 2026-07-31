@@ -109,10 +109,13 @@ CF_IPV6_URL="https://www.cloudflare.com/ips-v6"
 # 确保工作目录存在
 mkdir -p "\$WORK_DIR"
 
-# ----- 清理旧规则（可靠提取编号） -----
+# ----- 清理旧规则（用最稳妥的方法提取编号） -----
 echo "清理旧规则..."
-sudo ufw status numbered | grep "${RULE_COMMENT}" | sed -n 's/^\[[[:space:]]*\([0-9]*\)\].*/\1/p' | sort -rn | while read -r num; do
-    sudo ufw delete "$num" >/dev/null 2>&1 || true
+sudo ufw status numbered | grep "\${RULE_COMMENT}" | awk '{print \$1}' | tr -d '[]' | sort -rn | while read -r num; do
+    # 确保是数字且非空
+    if [[ "\$num" =~ ^[0-9]+\$ ]]; then
+        sudo ufw delete "\$num" >/dev/null 2>&1 || true
+    fi
 done
 
 # 统一的规则添加函数：遍历所有端口，根据需要添加 TCP/UDP 规则
