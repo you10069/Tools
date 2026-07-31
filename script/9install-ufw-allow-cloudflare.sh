@@ -33,12 +33,12 @@ validate_port() {
 BASE_URL="https://raw.githubusercontent.com/you10069/Tools/main/service"
 
 # ---------------------------------------------------------
-# 输入要保护的端口（可多个，默认 50002）
+# 输入要保护的端口（可多个，默认 50002 和 8440）
 # ---------------------------------------------------------
-echo -e "${BLUE}请输入只允许 Cloudflare 访问的端口（多个端口用空格或逗号分隔，默认 50002）...${RESET}"
+echo -e "${BLUE}请输入只允许 Cloudflare 访问的端口（多个端口用空格或逗号分隔，默认 50002 8440）...${RESET}"
 while true; do
     read -p "端口: " input_ports
-    input_ports=${input_ports:-50002}
+    input_ports=${input_ports:-"50002 8440"}
     # 将逗号替换为空格，便于读取
     ports_str=$(echo "$input_ports" | tr ',' ' ')
     read -a CF_PORTS <<< "$ports_str"
