@@ -109,9 +109,9 @@ CF_IPV6_URL="https://www.cloudflare.com/ips-v6"
 # 确保工作目录存在
 mkdir -p "\$WORK_DIR"
 
-# ----- 清理旧规则（逐条逆序删除） -----
+# ----- 清理旧规则（用 for 循环逐条逆序删除，避免子shell问题） -----
 echo "清理旧规则..."
-sudo ufw status numbered | grep "\${RULE_COMMENT}" | awk '{print \$1}' | tr -d '[]' | sort -rn | while read -r num; do
+for num in \$(sudo ufw status numbered | grep "\${RULE_COMMENT}" | awk '{print \$1}' | tr -d '[]' | sort -rn); do
     sudo ufw delete "\$num" 2>/dev/null || true
 done
 
