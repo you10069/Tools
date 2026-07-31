@@ -110,7 +110,10 @@ CF_IPV6_URL="https://www.cloudflare.com/ips-v6"
 mkdir -p "\$WORK_DIR"
 
 # ----- 清理旧规则（所有带 cloudflare-allow 注释的规则） -----
-sudo ufw delete \$(sudo ufw status numbered | grep "\${RULE_COMMENT}" | awk -F'[][]' '{print \$2}' | sort -rn) 2>/dev/null || true
+echo "清理旧规则..."
+while read -r num; do
+    sudo ufw delete "$num" 2>/dev/null || true
+done < <(sudo ufw status numbered | grep "${RULE_COMMENT}" | awk -F'[][]' '{print $2}' | sort -rn)
 
 # 统一的规则添加函数：遍历所有端口，根据需要添加 TCP/UDP 规则
 add_rules() {
