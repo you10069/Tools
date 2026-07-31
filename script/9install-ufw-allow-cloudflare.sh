@@ -117,8 +117,8 @@ add_rules() {
     local ip="\$1"
     for PORT in \$PORTS; do
         if [ "\$PROTO" = "both" ]; then
-            sudo ufw allow from "\$ip" to any port "\$PORT" proto tcp comment "\$RULE_COMMENT"
-            sudo ufw allow from "\$ip" to any port "\$PORT" proto udp comment "\$RULE_COMMENT"
+            # 不指定 proto 即同时允许 TCP 和 UDP
+            sudo ufw allow from "\$ip" to any port "\$PORT" comment "\$RULE_COMMENT"
         else
             sudo ufw allow from "\$ip" to any port "\$PORT" proto "\$PROTO" comment "\$RULE_COMMENT"
         fi
