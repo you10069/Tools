@@ -28,24 +28,52 @@ validate_port() {
 }
 
 # ============================
-# GitHub 基础路径（与 iptables-redirect 相同）
+# GitHub 基础路径
 # ============================
 BASE_URL="https://raw.githubusercontent.com/you10069/Tools/main/service"
 
 # ---------------------------------------------------------
-# 输入要保护的端口（默认 50002）
+# 输入要保护的端口（可多个，默认 50002）
 # ---------------------------------------------------------
-echo -e "${BLUE}请输入只允许 Cloudflare 访问的 TCP 端口（默认 50002）...${RESET}"
+echo -e "${BLUE}请输入只允许 Cloudflare 访问的端口（多个端口用空格或逗号分隔，默认 50002）...${RESET}"
 while true; do
-    read -p "端口: " CF_PORT
-    CF_PORT=${CF_PORT:-50002}
-    if validate_port "$CF_PORT"; then break; fi
-    echo -e "${RED}❌ 端口无效，请输入 1-65535 的纯数字${RESET}"
+    read -p "端口: " input_ports
+    input_ports=${input_ports:-50002}
+    # 将逗号替换为空格，便于读取
+    ports_str=$(echo "$input_ports" | tr ',' ' ')
+    read -a CF_PORTS <<< "$ports_str"
+    # 逐个验证
+    valid=true
+    for p in "${CF_PORTS[@]}"; do
+        if ! validate_port "$p"; then
+            echo -e "${RED}❌ 端口 $p 无效，请输入 1-65535 的纯数字${RESET}"
+            valid=false
+            break
+        fi
+    done
+    if $valid; then break; fi
 done
-echo -e "${YELLOW}✔ 保护端口：${CF_PORT}/tcp${RESET}"
+echo -e "${YELLOW}✔ 保护端口：${CF_PORTS[*]}${RESET}"
 
 # ---------------------------------------------------------
-# 检查 UFW 是否已启用（不修改默认策略）
+# 选择协议类型（默认 TCP 和 UDP）
+# ---------------------------------------------------------
+echo -e "${BLUE}请选择允许 Cloudflare 访问的协议：${RESET}"
+echo "  1) TCP"
+echo "  2) UDP"
+echo "  3) TCP 和 UDP (默认)"
+read -p "请输入选项 [1-3] (默认 3): " proto_choice
+proto_choice=${proto_choice:-3}
+case $proto_choice in
+    1) CF_PROTO="tcp" ;;
+    2) CF_PROTO="udp" ;;
+    3) CF_PROTO="both" ;;
+    *) echo -e "${RED}无效输入，使用默认 both${RESET}"; CF_PROTO="both" ;;
+esac
+echo -e "${YELLOW}✔ 协议类型：${CF_PROTO}${RESET}"
+
+# ---------------------------------------------------------
+# 检查 UFW 是否已启用
 # ---------------------------------------------------------
 echo -e "${BLUE}检查 UFW 状态...${RESET}"
 if ! sudo ufw status | grep -q "Status: active"; then
@@ -56,18 +84,22 @@ else
 fi
 
 # ---------------------------------------------------------
-# 生成 ufw-allow-cloudflare.sh（路径与 iptables-redirect.sh 一致）
+# 生成 ufw-allow-cloudflare.sh
 # ---------------------------------------------------------
 echo -e "${BLUE}生成 ufw-allow-cloudflare.sh ...${RESET}"
 
 mkdir -p /etc/sing-box/iptables
 
+# 将端口数组转为空格分隔的字符串，写入生成脚本
+CF_PORTS_STR="${CF_PORTS[*]}"
+
 cat > /etc/sing-box/iptables/ufw-allow-cloudflare.sh <<EOF
 #!/usr/bin/env bash
 set -e
 
-PORT="${CF_PORT}"
-PROTO="tcp"
+# 端口列表（空格分隔）
+PORTS="${CF_PORTS_STR}"
+PROTO="${CF_PROTO}"
 RULE_COMMENT="cloudflare-allow"
 WORK_DIR="/etc/sing-box/iptables"
 
@@ -77,8 +109,21 @@ CF_IPV6_URL="https://www.cloudflare.com/ips-v6"
 # 确保工作目录存在
 mkdir -p "\$WORK_DIR"
 
-# ----- 清理旧规则 -----
+# ----- 清理旧规则（所有带 cloudflare-allow 注释的规则） -----
 sudo ufw delete \$(sudo ufw status numbered | grep "\${RULE_COMMENT}" | awk -F'[][]' '{print \$2}' | sort -rn) 2>/dev/null || true
+
+# 统一的规则添加函数：遍历所有端口，根据需要添加 TCP/UDP 规则
+add_rules() {
+    local ip="\$1"
+    for PORT in \$PORTS; do
+        if [ "\$PROTO" = "both" ]; then
+            sudo ufw allow from "\$ip" to any port "\$PORT" proto tcp comment "\$RULE_COMMENT"
+            sudo ufw allow from "\$ip" to any port "\$PORT" proto udp comment "\$RULE_COMMENT"
+        else
+            sudo ufw allow from "\$ip" to any port "\$PORT" proto "\$PROTO" comment "\$RULE_COMMENT"
+        fi
+    done
+}
 
 # ----- IPv4 -----
 echo "下载并保存 Cloudflare IPv4 列表到 \${WORK_DIR}/cloudflare-ips-v4 ..."
@@ -86,7 +131,7 @@ curl -sL "\$CF_IPV4_URL" -o "\${WORK_DIR}/cloudflare-ips-v4"
 
 echo "添加 IPv4 规则..."
 while read -r ip; do
-    sudo ufw allow from "\$ip" to any port "\$PORT" proto "\$PROTO" comment "\$RULE_COMMENT"
+    add_rules "\$ip"
 done < "\${WORK_DIR}/cloudflare-ips-v4"
 
 # ----- IPv6 -----
@@ -94,7 +139,7 @@ echo "下载并保存 Cloudflare IPv6 列表到 \${WORK_DIR}/cloudflare-ips-v6 .
 if curl -sL --connect-timeout 5 "\$CF_IPV6_URL" -o "\${WORK_DIR}/cloudflare-ips-v6" 2>/dev/null; then
     echo "添加 IPv6 规则..."
     while read -r ip; do
-        sudo ufw allow from "\$ip" to any port "\$PORT" proto "\$PROTO" comment "\$RULE_COMMENT"
+        add_rules "\$ip"
     done < "\${WORK_DIR}/cloudflare-ips-v6"
 else
     echo "跳过 IPv6 规则（下载失败或网络不可达）"
